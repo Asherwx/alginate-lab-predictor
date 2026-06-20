@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>海藻酸钠-壳聚糖实验效果预测器</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f5f7;
+      --surface: rgba(255, 255, 255, 0.78);
+      --surface-solid: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --line: rgba(0, 0, 0, 0.10);
+      --line-soft: rgba(0, 0, 0, 0.06);
+      --accent: #0071e3;
+      --accent-deep: #005bb8;
+      --good: #0a7f42;
+      --warn: #9b5a00;
+      --bad: #b42318;
+      --radius: 22px;
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.10);
+      --soft-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 6%, rgba(0, 113, 227, 0.11), transparent 28%),
+        radial-gradient(circle at 82% 4%, rgba(88, 86, 214, 0.10), transparent 24%),
+        linear-gradient(180deg, #fbfbfd 0%, var(--bg) 46%, #ffffff 100%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.5;
+      letter-spacing: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px clamp(18px, 4vw, 52px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+      background: rgba(251, 251, 253, 0.78);
+      backdrop-filter: blur(22px) saturate(180%);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #ffffff;
+      background: linear-gradient(145deg, #0071e3, #61a8ff);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 8px 22px rgba(0, 113, 227, 0.26);
+    }
+
+    .nav-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border: 1px solid var(--line-soft);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: #424245;
+    }
+
+    header {
+      padding: clamp(36px, 6vw, 78px) clamp(20px, 5vw, 72px) 22px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    h1 {
+      max-width: 920px;
+      margin: 0 auto;
+      font-size: clamp(36px, 6.8vw, 78px);
+      line-height: 1.04;
+      letter-spacing: 0;
+      font-weight: 760;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 18px auto 0;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 21px);
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
+      gap: 20px;
+      width: min(1460px, calc(100% - 36px));
+      margin: 0 auto 44px;
+    }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      box-shadow: var(--soft-shadow);
+      backdrop-filter: blur(28px) saturate(170%);
+      overflow: hidden;
+    }
+
+    .panel-primary {
+      align-self: start;
+      position: sticky;
+      top: 70px;
+    }
+
+    .section-head {
+      padding: 20px 22px 15px;
+      border-bottom: 1px solid var(--line-soft);
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 720;
+      letter-spacing: 0;
+    }
+
+    .section-copy {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .body {
+      padding: 18px 22px 22px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .field {
+      min-width: 0;
+    }
+
+    label {
+      display: block;
+      min-height: 20px;
+      margin-bottom: 6px;
+      color: #424245;
+      font-size: 12px;
+      font-weight: 620;
+    }
+
+    input, select {
+      width: 100%;
+      height: 42px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      padding: 0 12px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: rgba(0, 113, 227, 0.68);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+      background: #ffffff;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button, .file-label, .hero-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      min-height: 42px;
+      padding: 10px 16px;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 650;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+      box-shadow: 0 10px 26px rgba(0, 113, 227, 0.20);
+    }
+
+    button:hover, .file-label:hover, .hero-link:hover {
+      background: var(--accent-deep);
+      transform: translateY(-1px);
+    }
+
+    button.secondary, .file-label, .hero-link.secondary {
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--accent);
+      border-color: rgba(0, 113, 227, 0.18);
+      box-shadow: none;
+    }
+
+    button.secondary:hover, .file-label:hover, .hero-link.secondary:hover {
+      background: rgba(0, 113, 227, 0.08);
+    }
+
+    input[type="file"] { display: none; }
+
+    .results {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      min-height: 128px;
+      padding: 18px;
+      border: 1px solid var(--line-soft);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .metric .label {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 620;
+    }
+
+    .metric .value {
+      color: #111114;
+      font-size: clamp(28px, 4.4vw, 46px);
+      line-height: 1;
+      font-weight: 760;
+      overflow-wrap: anywhere;
+    }
+
+    .metric .note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border: 1px solid rgba(0, 113, 227, 0.18);
+      border-radius: 16px;
+      background: rgba(0, 113, 227, 0.08);
+      color: #173f70;
+      font-size: 14px;
+    }
+
+    .status.warn {
+      border-color: rgba(255, 149, 0, 0.22);
+      background: rgba(255, 149, 0, 0.10);
+      color: #6b4100;
+    }
+
+    .status.bad {
+      border-color: rgba(255, 59, 48, 0.20);
+      background: rgba(255, 59, 48, 0.09);
+      color: #7a1d17;
+    }
+
+    .stack {
+      display: grid;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid var(--line-soft);
+      padding: 10px 12px;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    td:last-child, th:last-child { white-space: normal; }
+
+    th {
+      color: #424245;
+      background: rgba(245, 245, 247, 0.94);
+      position: sticky;
+      top: 0;
+      font-weight: 680;
+      z-index: 1;
+    }
+
+    .table-wrap {
+      max-height: 330px;
+      overflow: auto;
+      border: 1px solid var(--line-soft);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.70);
+    }
+
+    .model-line {
+      flex: 0 0 auto;
+      max-width: 46%;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .hint {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .model-card {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .mini {
+      padding: 12px;
+      border: 1px solid var(--line-soft);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .mini strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+
+    .mini span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 1100px) {
+      main {
+        grid-template-columns: 1fr;
+        width: min(940px, calc(100% - 28px));
+      }
+
+      .panel-primary {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .nav-meta {
+        display: none;
+      }
+
+      header {
+        text-align: left;
+        padding-inline: 18px;
+      }
+
+      h1, .subtitle {
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .hero-actions {
+        justify-content: flex-start;
+      }
+
+      .grid, .results, .model-card {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        display: block;
+      }
+
+      .model-line {
+        display: block;
+        max-width: none;
+        margin-top: 8px;
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 520px) {
+      main { width: calc(100% - 20px); }
+      .body, .section-head { padding-left: 16px; padding-right: 16px; }
+      button, .file-label, .hero-link { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar" aria-label="页面导航">
+    <div class="brand">
+      <span class="brand-mark">AI</span>
+      <span>Alginate Lab</span>
+    </div>
+    <div class="nav-meta">
+      <span class="pill">本地训练</span>
+      <span class="pill">CSV 导入</span>
+      <span class="pill">实验推荐</span>
+    </div>
+  </nav>
+
+  <header>
+    <p class="eyebrow">Environmental Engineering AI Toolkit</p>
+    <h1>海藻酸钠-壳聚糖实验效果预测器</h1>
+    <p class="subtitle">以 pH、材料配方、冻干和振荡培养参数为输入，预测终点 OD 或去除率，并为下一批实验自动筛选条件。</p>
+    <div class="hero-actions">
+      <a class="hero-link" href="#workspace">开始预测</a>
+      <a class="hero-link secondary" href="sample_experiment_data.csv">查看示例 CSV</a>
+    </div>
+  </header>
+
+  <main id="workspace">
+    <section class="panel-primary">
+      <div class="section-head">
+        <div>
+          <h2>实验条件</h2>
+          <p class="section-copy">输入当前实验设置，或导入历史数据训练模型。</p>
+        </div>
+        <span class="model-line" id="modelMode">当前：机理启发模型</span>
+      </div>
+      <div class="body">
+        <div class="grid">
+          <div class="field">
+            <label>海藻酸钠浓度 / %</label>
+            <input id="alginate_pct" type="number" step="0.1" value="2.0" />
+          </div>
+          <div class="field">
+            <label>壳聚糖浓度 / %</label>
+            <input id="chitosan_pct" type="number" step="0.1" value="1.0" />
+          </div>
+          <div class="field">
+            <label>冰乙酸环境时间 / h</label>
+            <input id="acid_time_h" type="number" step="0.5" value="12" />
+          </div>
+          <div class="field">
+            <label>改性强度 / 0-1</label>
+            <input id="modifier_level" type="number" step="0.05" value="0.5" />
+          </div>
+          <div class="field">
+            <label>冻干时间 / h</label>
+            <input id="freeze_dry_h" type="number" step="1" value="24" />
+          </div>
+          <div class="field">
+            <label>初始 pH</label>
+            <input id="initial_ph" type="number" step="0.1" value="7.0" />
+          </div>
+          <div class="field">
+            <label>初始 OD</label>
+            <input id="initial_od" type="number" step="0.01" value="0.20" />
+          </div>
+          <div class="field">
+            <label>材料投加量 / g L-1</label>
+            <input id="dose_g_l" type="number" step="0.1" value="2.0" />
+          </div>
+          <div class="field">
+            <label>振荡转速 / rpm</label>
+            <input id="rpm" type="number" step="5" value="150" />
+          </div>
+          <div class="field">
+            <label>反应/培养时间 / h</label>
+            <input id="time_h" type="number" step="1" value="48" />
+          </div>
+          <div class="field">
+            <label>温度 / degC</label>
+            <input id="temperature_c" type="number" step="0.5" value="25" />
+          </div>
+          <div class="field">
+            <label>预测目标</label>
+            <select id="target">
+              <option value="target_od">终点 OD</option>
+              <option value="removal_pct">去除率 / %</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="predictBtn">预测效果</button>
+          <button class="secondary" id="recommendBtn">推荐实验点</button>
+          <label class="file-label" for="csvFile">导入 CSV 训练</label>
+          <input id="csvFile" type="file" accept=".csv,text/csv" />
+          <button class="secondary" id="resetBtn">恢复默认模型</button>
+        </div>
+        <p class="hint">CSV 表头建议包含 alginate_pct,chitosan_pct,acid_time_h,modifier_level,freeze_dry_h,initial_ph,initial_od,dose_g_l,rpm,time_h,temperature_c,target_od,removal_pct。</p>
+        <div class="model-card" aria-label="模型说明">
+          <div class="mini">
+            <strong>早期探索</strong>
+            <span>默认模型用于预筛条件。</span>
+          </div>
+          <div class="mini">
+            <strong>数据训练</strong>
+            <span>CSV 会在本地拟合岭回归。</span>
+          </div>
+          <div class="mini">
+            <strong>下一步</strong>
+            <span>围绕高分点做重复实验。</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="stack">
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>预测结果</h2>
+            <p class="section-copy">数值会随默认模型或导入数据训练模型自动更新。</p>
+          </div>
+          <span class="model-line" id="sampleInfo">尚未导入训练数据</span>
+        </div>
+        <div class="body">
+          <div class="results">
+            <div class="metric">
+              <div class="label" id="mainLabel">预测终点 OD</div>
+              <div class="value" id="predValue">-</div>
+              <div class="note" id="predNote">点击预测后显示</div>
+            </div>
+            <div class="metric">
+              <div class="label">OD 增长率</div>
+              <div class="value" id="growthValue">-</div>
+              <div class="note">相对初始 OD</div>
+            </div>
+            <div class="metric">
+              <div class="label">效果等级</div>
+              <div class="value" id="gradeValue">-</div>
+              <div class="note" id="gradeNote">用于筛选实验条件</div>
+            </div>
+          </div>
+          <div id="interpretation" class="status">等待输入。建议先用默认模型筛选 pH、投加量和时间，再导入你的真实数据训练。</div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>推荐下一批实验</h2>
+            <p class="section-copy">从 pH、投加量和时间范围内扫描高潜力组合。</p>
+          </div>
+          <span class="model-line">扫描 pH 4-10、投加量 0.5-5、时间 12-96 h</span>
+        </div>
+        <div class="body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>排序</th>
+                  <th>pH</th>
+                  <th>投加量</th>
+                  <th>时间</th>
+                  <th>预测值</th>
+                  <th>说明</th>
+                </tr>
+              </thead>
+              <tbody id="recommendRows">
+                <tr><td colspan="6">点击“推荐实验点”生成。</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div>
+            <h2>训练数据预览</h2>
+            <p class="section-copy">导入后显示前 20 行，并计算拟合指标。</p>
+          </div>
+          <span class="model-line" id="fitInfo">R2：-，RMSE：-</span>
+        </div>
+        <div class="body">
+          <div class="table-wrap">
+            <table>
+              <thead id="dataHead"><tr><th>暂无数据</th></tr></thead>
+              <tbody id="dataRows"><tr><td>导入 CSV 后显示前 20 行。</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const featureNames = [
+      "alginate_pct", "chitosan_pct", "acid_time_h", "modifier_level",
+      "freeze_dry_h", "initial_ph", "initial_od", "dose_g_l",
+      "rpm", "time_h", "temperature_c"
+    ];
+
+    let trained = null;
+
+    function num(id) {
+      const value = Number(document.getElementById(id).value);
+      return Number.isFinite(value) ? value : 0;
+    }
+
+    function readInput() {
+      const row = {};
+      featureNames.forEach(name => row[name] = num(name));
+      return row;
+    }
+
+    function clamp(x, lo, hi) {
+      return Math.max(lo, Math.min(hi, x));
+    }
+
+    function heuristic(row, target) {
+      const phScore = Math.exp(-Math.pow(row.initial_ph - 7.2, 2) / 5.2);
+      const tempScore = Math.exp(-Math.pow(row.temperature_c - 25, 2) / 90);
+      const rpmScore = Math.exp(-Math.pow(row.rpm - 145, 2) / 9000);
+      const matrixScore = clamp(0.45 + 0.18 * row.alginate_pct + 0.12 * row.chitosan_pct + 0.18 * row.modifier_level, 0.2, 1.35);
+      const dosePenalty = 1 - 0.055 * Math.max(0, row.dose_g_l - 3.2);
+      const timeFactor = 1 - Math.exp(-Math.max(0, row.time_h) / 34);
+      const acidBalance = Math.exp(-Math.pow(row.acid_time_h - 12, 2) / 150);
+      const dryBalance = Math.exp(-Math.pow(row.freeze_dry_h - 30, 2) / 500);
+      const growth = clamp(0.1 + 1.8 * phScore * tempScore * rpmScore * timeFactor * dosePenalty + 0.22 * matrixScore * acidBalance * dryBalance, -0.35, 3.2);
+      const od = clamp(row.initial_od * (1 + growth), 0.005, 4.0);
+      const removal = clamp(18 + 68 * phScore * matrixScore * timeFactor + 8 * row.modifier_level - 4 * Math.abs(row.initial_ph - 7.2), 0, 99);
+      return target === "removal_pct" ? removal : od;
+    }
+
+    function transform(row) {
+      const raw = featureNames.map(name => Number(row[name]));
+      const extra = [
+        row.initial_ph * row.initial_ph,
+        row.dose_g_l * row.time_h,
+        row.alginate_pct * row.chitosan_pct,
+        row.initial_ph * row.dose_g_l,
+        Math.log1p(Math.max(0, row.time_h))
+      ];
+      return [1, ...raw, ...extra];
+    }
+
+    function transpose(a) {
+      return a[0].map((_, i) => a.map(r => r[i]));
+    }
+
+    function multiply(a, b) {
+      const rows = a.length, cols = b[0].length, inner = b.length;
+      const out = Array.from({ length: rows }, () => Array(cols).fill(0));
+      for (let i = 0; i < rows; i++) {
+        for (let k = 0; k < inner; k++) {
+          for (let j = 0; j < cols; j++) out[i][j] += a[i][k] * b[k][j];
+        }
+      }
+      return out;
+    }
+
+    function inverse(matrix) {
+      const n = matrix.length;
+      const a = matrix.map((row, i) => [...row, ...Array.from({ length: n }, (_, j) => i === j ? 1 : 0)]);
+      for (let i = 0; i < n; i++) {
+        let max = i;
+        for (let r = i + 1; r < n; r++) if (Math.abs(a[r][i]) > Math.abs(a[max][i])) max = r;
+        [a[i], a[max]] = [a[max], a[i]];
+        const pivot = a[i][i] || 1e-12;
+        for (let c = 0; c < 2 * n; c++) a[i][c] /= pivot;
+        for (let r = 0; r < n; r++) {
+          if (r === i) continue;
+          const factor = a[r][i];
+          for (let c = 0; c < 2 * n; c++) a[r][c] -= factor * a[i][c];
+        }
+      }
+      return a.map(row => row.slice(n));
+    }
+
+    function trainRidge(rows, target) {
+      const clean = rows.filter(row => featureNames.every(f => Number.isFinite(Number(row[f]))) && Number.isFinite(Number(row[target])));
+      if (clean.length < 6) throw new Error("至少需要 6 行有效数据。");
+      const x = clean.map(transform);
+      const y = clean.map(row => [Number(row[target])]);
+      const xt = transpose(x);
+      const xtx = multiply(xt, x);
+      const lambda = 0.35;
+      for (let i = 1; i < xtx.length; i++) xtx[i][i] += lambda;
+      const weights = multiply(multiply(inverse(xtx), xt), y).map(r => r[0]);
+      const preds = x.map(v => dot(weights, v));
+      const meanY = y.reduce((s, v) => s + v[0], 0) / y.length;
+      const ssRes = preds.reduce((s, p, i) => s + Math.pow(p - y[i][0], 2), 0);
+      const ssTot = y.reduce((s, v) => s + Math.pow(v[0] - meanY, 2), 0) || 1;
+      const rmse = Math.sqrt(ssRes / y.length);
+      return { weights, target, n: clean.length, r2: 1 - ssRes / ssTot, rmse, rows: clean };
+    }
+
+    function dot(a, b) {
+      return a.reduce((s, v, i) => s + v * b[i], 0);
+    }
+
+    function predict(row) {
+      const target = document.getElementById("target").value;
+      if (trained && trained.target === target) {
+        const value = dot(trained.weights, transform(row));
+        return target === "removal_pct" ? clamp(value, 0, 100) : clamp(value, 0.001, 5);
+      }
+      return heuristic(row, target);
+    }
+
+    function classify(row, value, target) {
+      if (target === "removal_pct") {
+        if (value >= 80) return ["优", "预测去除率高，适合做重复验证和表征。", "status"];
+        if (value >= 55) return ["中", "有优化空间，建议围绕 pH 和投加量加密。", "status warn"];
+        return ["低", "效果偏弱，可提高改性强度或调整 pH。", "status bad"];
+      }
+      const growth = (value - row.initial_od) / Math.max(row.initial_od, 0.001);
+      if (growth >= 1.0) return ["促进", "藻液增长明显，适合研究材料生物相容性或协同去除。", "status"];
+      if (growth >= 0.15) return ["温和", "藻液保持增长，可作为低毒性条件继续比较。", "status warn"];
+      return ["抑制", "可能存在酸胁迫、材料投加过量或表面电荷影响。", "status bad"];
+    }
+
+    function showPrediction() {
+      const row = readInput();
+      const target = document.getElementById("target").value;
+      const value = predict(row);
+      const growth = (target === "target_od") ? (value - row.initial_od) / Math.max(row.initial_od, 0.001) : NaN;
+      document.getElementById("mainLabel").textContent = target === "removal_pct" ? "预测去除率 / %" : "预测终点 OD";
+      document.getElementById("predValue").textContent = target === "removal_pct" ? value.toFixed(1) : value.toFixed(3);
+      document.getElementById("growthValue").textContent = Number.isFinite(growth) ? `${(growth * 100).toFixed(1)}%` : "按 OD 目标显示";
+      const [grade, note, cls] = classify(row, value, target);
+      document.getElementById("gradeValue").textContent = grade;
+      document.getElementById("gradeNote").textContent = note;
+      document.getElementById("predNote").textContent = trained && trained.target === target ? "来自导入数据训练模型" : "来自机理启发估算";
+      const interp = document.getElementById("interpretation");
+      interp.className = cls;
+      interp.textContent = buildInterpretation(row, value, target);
+    }
+
+    function buildInterpretation(row, value, target) {
+      const notes = [];
+      if (row.initial_ph < 5.5) notes.push("pH 偏酸，壳聚糖氨基质子化增强，可能提高吸附但增加藻细胞酸胁迫。");
+      if (row.initial_ph > 8.8) notes.push("pH 偏碱，需关注藻生长优势与材料表面电荷变化。");
+      if (row.dose_g_l > 4) notes.push("投加量较高，可能遮光、吸附营养盐或引入颗粒胁迫。");
+      if (row.time_h < 24) notes.push("时间较短，建议配合 48 h 和 72 h 点判断趋势。");
+      if (!notes.length) notes.push("条件处于较稳健区间，适合作为中心点做响应面或正交实验。");
+      const prefix = target === "removal_pct" ? `预测去除率 ${value.toFixed(1)}%。` : `预测终点 OD ${value.toFixed(3)}。`;
+      return prefix + notes.join("");
+    }
+
+    function recommend() {
+      const base = readInput();
+      const target = document.getElementById("target").value;
+      const candidates = [];
+      for (let ph = 4; ph <= 10; ph += 0.5) {
+        for (let dose = 0.5; dose <= 5; dose += 0.5) {
+          for (const time of [12, 24, 48, 72, 96]) {
+            const row = { ...base, initial_ph: ph, dose_g_l: dose, time_h: time };
+            const value = predict(row);
+            const penalty = 0.015 * Math.max(0, dose - 3) + 0.001 * Math.max(0, time - 72);
+            const score = target === "removal_pct" ? value - 100 * penalty : value - penalty;
+            candidates.push({ ph, dose, time, value, score });
+          }
+        }
+      }
+      candidates.sort((a, b) => b.score - a.score);
+      const top = candidates.slice(0, 8);
+      const tbody = document.getElementById("recommendRows");
+      tbody.innerHTML = top.map((r, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${r.ph.toFixed(1)}</td>
+          <td>${r.dose.toFixed(1)} g/L</td>
+          <td>${r.time} h</td>
+          <td>${target === "removal_pct" ? r.value.toFixed(1) + "%" : r.value.toFixed(3)}</td>
+          <td>${r.dose <= 3 ? "投加量较温和" : "建议检查遮光和材料胁迫"}</td>
+        </tr>
+      `).join("");
+    }
+
+    function parseCsv(text) {
+      const lines = text.trim().split(/\r?\n/).filter(Boolean);
+      const headers = splitCsvLine(lines[0]).map(h => h.trim());
+      return lines.slice(1).map(line => {
+        const cells = splitCsvLine(line);
+        const row = {};
+        headers.forEach((h, i) => row[h] = Number(cells[i]));
+        return row;
+      });
+    }
+
+    function splitCsvLine(line) {
+      const out = [];
+      let cell = "";
+      let quote = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') quote = !quote;
+        else if (ch === "," && !quote) {
+          out.push(cell);
+          cell = "";
+        } else cell += ch;
+      }
+      out.push(cell);
+      return out;
+    }
+
+    function previewRows(rows) {
+      const headers = [...featureNames, document.getElementById("target").value].filter((v, i, a) => a.indexOf(v) === i);
+      document.getElementById("dataHead").innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>`;
+      document.getElementById("dataRows").innerHTML = rows.slice(0, 20).map(row => `
+        <tr>${headers.map(h => `<td>${Number.isFinite(Number(row[h])) ? Number(row[h]).toFixed(3).replace(/\.?0+$/, "") : ""}</td>`).join("")}</tr>
+      `).join("");
+    }
+
+    document.getElementById("predictBtn").addEventListener("click", showPrediction);
+    document.getElementById("recommendBtn").addEventListener("click", () => { showPrediction(); recommend(); });
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      trained = null;
+      document.getElementById("modelMode").textContent = "当前：机理启发模型";
+      document.getElementById("sampleInfo").textContent = "尚未导入训练数据";
+      document.getElementById("fitInfo").textContent = "R2：-，RMSE：-";
+      showPrediction();
+    });
+
+    document.getElementById("csvFile").addEventListener("change", async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const target = document.getElementById("target").value;
+        const rows = parseCsv(await file.text());
+        trained = trainRidge(rows, target);
+        document.getElementById("modelMode").textContent = `当前：CSV 岭回归模型，目标 ${target}`;
+        document.getElementById("sampleInfo").textContent = `训练样本：${trained.n} 行`;
+        document.getElementById("fitInfo").textContent = `R2：${trained.r2.toFixed(3)}，RMSE：${trained.rmse.toFixed(3)}`;
+        previewRows(trained.rows);
+        showPrediction();
+      } catch (err) {
+        alert(err.message || "CSV 训练失败，请检查表头和数值。");
+      }
+    });
+
+    document.getElementById("target").addEventListener("change", () => {
+      if (trained && trained.target !== document.getElementById("target").value) {
+        document.getElementById("sampleInfo").textContent = "目标已切换，请重新导入 CSV 训练";
+      }
+      showPrediction();
+    });
+
+    showPrediction();
+  </script>
+</body>
+</html>
