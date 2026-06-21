@@ -6,22 +6,22 @@
   <title>海藻酸钠-壳聚糖实验效果预测器</title>
   <style>
     :root {
-      color-scheme: light;
-      --bg: #f5f5f7;
-      --surface: rgba(255, 255, 255, 0.78);
-      --surface-solid: #ffffff;
-      --text: #1d1d1f;
-      --muted: #6e6e73;
-      --line: rgba(0, 0, 0, 0.10);
-      --line-soft: rgba(0, 0, 0, 0.06);
-      --accent: #0071e3;
-      --accent-deep: #005bb8;
+      color-scheme: dark;
+      --bg: #020203;
+      --surface: rgba(18, 19, 23, 0.72);
+      --surface-solid: #111216;
+      --text: #f5f5f7;
+      --muted: #96969f;
+      --line: rgba(255, 255, 255, 0.13);
+      --line-soft: rgba(255, 255, 255, 0.08);
+      --accent: #f3a64b;
+      --accent-deep: #ffffff;
       --good: #0a7f42;
-      --warn: #9b5a00;
-      --bad: #b42318;
-      --radius: 22px;
-      --shadow: 0 22px 70px rgba(0, 0, 0, 0.10);
-      --soft-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+      --warn: #e6a13c;
+      --bad: #ff6b61;
+      --radius: 24px;
+      --shadow: 0 28px 90px rgba(0, 0, 0, 0.52);
+      --soft-shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
     }
 
     * { box-sizing: border-box; }
@@ -31,28 +31,91 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background:
-        radial-gradient(circle at 18% 6%, rgba(0, 113, 227, 0.11), transparent 28%),
-        radial-gradient(circle at 82% 4%, rgba(88, 86, 214, 0.10), transparent 24%),
-        linear-gradient(180deg, #fbfbfd 0%, var(--bg) 46%, #ffffff 100%);
+      background: var(--bg);
+      --parallax-x: 0px;
+      --parallax-y: 0px;
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
       line-height: 1.5;
       letter-spacing: 0;
     }
 
+    #ambientCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.72;
+      mix-blend-mode: screen;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -4%;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.62) 45%, rgba(0, 0, 0, 0.92) 78%, #020203 100%),
+        radial-gradient(circle at 50% 24%, rgba(255, 255, 255, 0.08), transparent 26%),
+        url("assets/hydrogel-hero.png") calc(50% + var(--parallax-x)) calc(0% + var(--parallax-y)) / cover no-repeat;
+      filter: saturate(1.08) contrast(1.05);
+      transform: scale(1.03);
+      animation: heroDrift 18s ease-in-out infinite alternate;
+      will-change: transform, background-position;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.055) 44%, rgba(243, 166, 75, 0.10) 50%, transparent 58%),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 120px);
+      opacity: 0.52;
+      transform: translateX(-38%);
+      animation: lightSweep 12s ease-in-out infinite;
+      mix-blend-mode: screen;
+    }
+
+    @keyframes heroDrift {
+      0% { transform: scale(1.03) translate3d(-1.2%, -0.6%, 0); filter: saturate(1.06) contrast(1.05); }
+      50% { transform: scale(1.07) translate3d(0.8%, 0.5%, 0); filter: saturate(1.18) contrast(1.08); }
+      100% { transform: scale(1.04) translate3d(1.4%, -0.2%, 0); filter: saturate(1.10) contrast(1.06); }
+    }
+
+    @keyframes lightSweep {
+      0%, 18% { transform: translateX(-48%); opacity: 0; }
+      42%, 66% { opacity: 0.52; }
+      100% { transform: translateX(48%); opacity: 0; }
+    }
+
     .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 5;
+      position: relative;
+      z-index: 8;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      padding: 12px clamp(18px, 4vw, 52px);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.07);
-      background: rgba(251, 251, 253, 0.78);
-      backdrop-filter: blur(22px) saturate(180%);
+      gap: 26px;
+      width: fit-content;
+      max-width: calc(100% - 32px);
+      margin: 26px auto 0;
+      padding: 10px 12px 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 999px;
+      background: rgba(18, 18, 20, 0.78);
+      box-shadow: 0 18px 54px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(24px) saturate(140%);
+      animation: navFloat 5.8s ease-in-out infinite;
+    }
+
+    @keyframes navFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
     }
 
     .brand {
@@ -60,6 +123,7 @@
       align-items: center;
       gap: 10px;
       min-width: 0;
+      color: #f8f8f8;
       font-size: 14px;
       font-weight: 650;
     }
@@ -69,12 +133,12 @@
       height: 28px;
       display: grid;
       place-items: center;
-      border-radius: 50%;
-      color: #ffffff;
-      background: linear-gradient(145deg, #0071e3, #61a8ff);
+      border-radius: 9px;
+      color: #050505;
+      background: #ffffff;
       font-size: 13px;
       font-weight: 700;
-      box-shadow: 0 8px 22px rgba(0, 113, 227, 0.26);
+      box-shadow: 0 8px 22px rgba(255, 255, 255, 0.12);
     }
 
     .nav-meta {
@@ -82,7 +146,7 @@
       align-items: center;
       gap: 10px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       white-space: nowrap;
     }
 
@@ -90,15 +154,38 @@
       display: inline-flex;
       align-items: center;
       min-height: 28px;
-      padding: 5px 10px;
-      border: 1px solid var(--line-soft);
+      padding: 6px 12px;
+      border: 1px solid transparent;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.72);
-      color: #424245;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.68);
+      font-weight: 650;
+    }
+
+    .pill:last-child {
+      border-color: rgba(255, 255, 255, 0.20);
+      background: rgba(255, 255, 255, 0.04);
+      color: #ffffff;
+    }
+
+    .glass-note {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      font-size: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
     }
 
     header {
-      padding: clamp(36px, 6vw, 78px) clamp(20px, 5vw, 72px) 22px;
+      min-height: min(780px, calc(100vh - 40px));
+      display: grid;
+      place-items: center;
+      padding: clamp(70px, 9vw, 128px) clamp(20px, 5vw, 72px) 130px;
       text-align: center;
     }
 
@@ -112,16 +199,21 @@
     h1 {
       max-width: 920px;
       margin: 0 auto;
-      font-size: clamp(36px, 6.8vw, 78px);
+      font-size: clamp(42px, 7vw, 92px);
       line-height: 1.04;
       letter-spacing: 0;
       font-weight: 760;
+      text-shadow: 0 18px 56px rgba(0, 0, 0, 0.85);
+    }
+
+    h1 .dim {
+      color: rgba(255, 255, 255, 0.36);
     }
 
     .subtitle {
       max-width: 760px;
       margin: 18px auto 0;
-      color: var(--muted);
+      color: rgba(255, 255, 255, 0.58);
       font-size: clamp(16px, 2vw, 21px);
     }
 
@@ -133,12 +225,73 @@
       margin-top: 24px;
     }
 
+    .hero-status {
+      width: min(460px, 100%);
+      margin: 82px auto 0;
+      padding: 18px 22px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 22px;
+      background: rgba(18, 18, 22, 0.78);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      box-shadow: 0 22px 68px rgba(0, 0, 0, 0.54), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      animation: statusFloat 4.6s ease-in-out infinite;
+    }
+
+    @keyframes statusFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .hero-status small {
+      display: block;
+      margin-bottom: 5px;
+      color: rgba(255, 255, 255, 0.42);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .hero-status strong {
+      color: #ffffff;
+      font-size: 15px;
+    }
+
+    .spinner {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.13);
+      border-top-color: #8e86ff;
+      border-right-color: #f3a64b;
+      animation: spin 1.4s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body::before,
+      body::after,
+      .topbar,
+      .hero-status,
+      .spinner {
+        animation: none !important;
+      }
+    }
+
     main {
       display: grid;
       grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
       gap: 20px;
       width: min(1460px, calc(100% - 36px));
-      margin: 0 auto 44px;
+      margin: -70px auto 56px;
     }
 
     section {
@@ -146,14 +299,14 @@
       border: 1px solid var(--line-soft);
       border-radius: var(--radius);
       box-shadow: var(--soft-shadow);
-      backdrop-filter: blur(28px) saturate(170%);
-      overflow: hidden;
+      backdrop-filter: blur(28px) saturate(145%);
+      overflow: visible;
     }
 
     .panel-primary {
       align-self: start;
       position: sticky;
-      top: 70px;
+      top: 112px;
     }
 
     .section-head {
@@ -197,7 +350,7 @@
       display: block;
       min-height: 20px;
       margin-bottom: 6px;
-      color: #424245;
+      color: rgba(255, 255, 255, 0.74);
       font-size: 12px;
       font-weight: 620;
     }
@@ -205,21 +358,137 @@
     input, select {
       width: 100%;
       height: 42px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.10);
       border-radius: 12px;
       padding: 0 12px;
       font-size: 14px;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.055);
       color: var(--text);
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22);
       transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    select {
+      color-scheme: dark;
+      appearance: auto;
+    }
+
+    select option {
+      background: #17181d;
+      color: #f5f5f7;
+    }
+
+    select option:checked,
+    select option:hover {
+      background: #2a241c;
+      color: #ffffff;
+    }
+
+    select.native-select {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .custom-select {
+      position: relative;
+      width: 100%;
+    }
+
+    .select-trigger {
+      width: 100%;
+      height: 64px;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 24px;
+      padding: 0 18px 0 22px;
+      background: rgba(255, 255, 255, 0.075);
+      color: #f8f8fb;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 18px 42px rgba(0, 0, 0, 0.28);
+      font-size: 18px;
+      font-weight: 760;
+      text-align: left;
+    }
+
+    .select-trigger:hover {
+      background: rgba(255, 255, 255, 0.11);
+      transform: translateY(-1px);
+    }
+
+    .select-trigger[aria-expanded="true"] {
+      border-color: rgba(243, 166, 75, 0.72);
+      box-shadow: 0 0 0 4px rgba(243, 166, 75, 0.12), 0 22px 60px rgba(0, 0, 0, 0.42);
+    }
+
+    .select-trigger::after {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid rgba(255, 255, 255, 0.82);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.82);
+      transform: rotate(45deg) translateY(-3px);
+      transition: transform 220ms ease;
+    }
+
+    .select-trigger[aria-expanded="true"]::after {
+      transform: rotate(225deg) translateY(-1px);
+    }
+
+    .select-menu {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 10px);
+      z-index: 30;
+      max-height: 360px;
+      overflow: auto;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      background: rgba(19, 20, 24, 0.75);
+      box-shadow: 0 28px 86px rgba(0, 0, 0, 0.56), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(30px) saturate(145%);
+      opacity: 0;
+      transform: translateY(-10px) scale(0.985);
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 220ms cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .custom-select.open .select-menu {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .select-option {
+      width: 100%;
+      min-height: 44px;
+      justify-content: flex-start;
+      border: 0;
+      border-radius: 16px;
+      padding: 10px 16px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.82);
+      box-shadow: none;
+      font-size: 16px;
+      font-weight: 720;
+      text-align: left;
+    }
+
+    .select-option:hover,
+    .select-option.active {
+      background: rgba(243, 166, 75, 0.14);
+      color: #ffffff;
+      transform: translateY(0);
     }
 
     input:focus, select:focus {
       outline: none;
-      border-color: rgba(0, 113, 227, 0.68);
-      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
-      background: #ffffff;
+      border-color: rgba(243, 166, 75, 0.70);
+      box-shadow: 0 0 0 4px rgba(243, 166, 75, 0.12);
+      background: rgba(255, 255, 255, 0.095);
     }
 
     .actions {
@@ -238,29 +507,30 @@
       min-height: 42px;
       padding: 10px 16px;
       background: var(--accent);
-      color: #ffffff;
+      color: #080808;
       font-size: 14px;
       font-weight: 650;
       text-decoration: none;
       cursor: pointer;
       transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
-      box-shadow: 0 10px 26px rgba(0, 113, 227, 0.20);
+      box-shadow: 0 16px 36px rgba(243, 166, 75, 0.22);
     }
 
     button:hover, .file-label:hover, .hero-link:hover {
       background: var(--accent-deep);
+      color: #050505;
       transform: translateY(-1px);
     }
 
     button.secondary, .file-label, .hero-link.secondary {
-      background: rgba(255, 255, 255, 0.74);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--accent);
-      border-color: rgba(0, 113, 227, 0.18);
+      border-color: rgba(255, 255, 255, 0.12);
       box-shadow: none;
     }
 
     button.secondary:hover, .file-label:hover, .hero-link.secondary:hover {
-      background: rgba(0, 113, 227, 0.08);
+      background: rgba(255, 255, 255, 0.10);
     }
 
     input[type="file"] { display: none; }
@@ -276,8 +546,8 @@
       padding: 18px;
       border: 1px solid var(--line-soft);
       border-radius: 18px;
-      background: rgba(255, 255, 255, 0.78);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.055);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
     .metric .label {
@@ -288,7 +558,7 @@
     }
 
     .metric .value {
-      color: #111114;
+      color: #ffffff;
       font-size: clamp(28px, 4.4vw, 46px);
       line-height: 1;
       font-weight: 760;
@@ -304,23 +574,23 @@
     .status {
       margin-top: 16px;
       padding: 14px 16px;
-      border: 1px solid rgba(0, 113, 227, 0.18);
+      border: 1px solid rgba(243, 166, 75, 0.18);
       border-radius: 16px;
-      background: rgba(0, 113, 227, 0.08);
-      color: #173f70;
+      background: rgba(243, 166, 75, 0.09);
+      color: rgba(255, 239, 211, 0.92);
       font-size: 14px;
     }
 
     .status.warn {
       border-color: rgba(255, 149, 0, 0.22);
       background: rgba(255, 149, 0, 0.10);
-      color: #6b4100;
+      color: #ffd89e;
     }
 
     .status.bad {
       border-color: rgba(255, 59, 48, 0.20);
       background: rgba(255, 59, 48, 0.09);
-      color: #7a1d17;
+      color: #ffb5af;
     }
 
     .stack {
@@ -347,8 +617,8 @@
     td:last-child, th:last-child { white-space: normal; }
 
     th {
-      color: #424245;
-      background: rgba(245, 245, 247, 0.94);
+      color: rgba(255, 255, 255, 0.74);
+      background: rgba(18, 18, 22, 0.94);
       position: sticky;
       top: 0;
       font-weight: 680;
@@ -360,7 +630,69 @@
       overflow: auto;
       border: 1px solid var(--line-soft);
       border-radius: 16px;
-      background: rgba(255, 255, 255, 0.70);
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .chart-toolbar {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .chart-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.8fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .chart-card {
+      min-height: 320px;
+      border: 1px solid var(--line-soft);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .chart-card svg {
+      display: block;
+      width: 100%;
+      height: 320px;
+    }
+
+    .chart-empty {
+      display: grid;
+      place-items: center;
+      height: 320px;
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .chart-summary {
+      display: grid;
+      gap: 10px;
+    }
+
+    .insight-row {
+      padding: 13px 14px;
+      border: 1px solid var(--line-soft);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .insight-row strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .insight-row span {
+      color: var(--muted);
+      font-size: 12px;
     }
 
     .model-line {
@@ -388,7 +720,7 @@
       padding: 12px;
       border: 1px solid var(--line-soft);
       border-radius: 16px;
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.045);
     }
 
     .mini strong {
@@ -410,6 +742,16 @@
 
       .panel-primary {
         position: static;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .chart-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-toolbar {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -464,6 +806,7 @@
   </style>
 </head>
 <body>
+  <canvas id="ambientCanvas" aria-hidden="true"></canvas>
   <nav class="topbar" aria-label="页面导航">
     <div class="brand">
       <span class="brand-mark">AI</span>
@@ -472,17 +815,26 @@
     <div class="nav-meta">
       <span class="pill">本地训练</span>
       <span class="pill">CSV 导入</span>
-      <span class="pill">实验推荐</span>
+      <span class="pill">自动出图</span>
     </div>
   </nav>
 
   <header>
-    <p class="eyebrow">Environmental Engineering AI Toolkit</p>
-    <h1>海藻酸钠-壳聚糖实验效果预测器</h1>
-    <p class="subtitle">以 pH、材料配方、冻干和振荡培养参数为输入，预测终点 OD 或去除率，并为下一批实验自动筛选条件。</p>
-    <div class="hero-actions">
-      <a class="hero-link" href="#workspace">开始预测</a>
-      <a class="hero-link secondary" href="sample_experiment_data.csv">查看示例 CSV</a>
+    <div>
+      <p class="eyebrow">Environmental Engineering AI Toolkit</p>
+      <h1><span class="dim">AI 驱动</span><br>藻酸盐复合材料实验预测</h1>
+      <p class="subtitle">以 pH、材料配方、冻干和振荡培养参数为输入，预测终点 OD 或去除率，并从实验数据中自动生成趋势图。</p>
+      <div class="hero-actions">
+        <a class="hero-link" href="#workspace">开始预测</a>
+        <a class="hero-link secondary" href="sample_experiment_data.csv">查看示例 CSV</a>
+      </div>
+      <div class="hero-status" aria-label="系统状态">
+        <div>
+          <small>System Status</small>
+          <strong>Analyzing Hydrogel Response...</strong>
+        </div>
+        <span class="spinner" aria-hidden="true"></span>
+      </div>
     </div>
   </header>
 
@@ -608,6 +960,51 @@
       <section>
         <div class="section-head">
           <div>
+            <h2>实验数据图谱</h2>
+            <p class="section-copy">导入 CSV 后自动生成散点图和数据摘要，可直接用于初筛规律。</p>
+          </div>
+          <span class="glass-note" id="chartStatus">等待数据</span>
+        </div>
+        <div class="body">
+          <div class="chart-toolbar">
+            <div class="field">
+              <label>X 轴变量</label>
+              <select id="chartX"></select>
+            </div>
+            <div class="field">
+              <label>Y 轴变量</label>
+              <select id="chartY"></select>
+            </div>
+            <div class="field">
+              <label>图形类型</label>
+              <select id="chartMode">
+                <option value="scatter">散点图</option>
+                <option value="line">趋势连线</option>
+              </select>
+            </div>
+          </div>
+          <div class="chart-shell">
+            <div class="chart-card">
+              <div class="chart-empty" id="chartEmpty">导入实验 CSV 后，这里会自动绘制 pH、投加量、时间与 OD/去除率之间的关系。</div>
+              <svg id="dataChart" viewBox="0 0 760 320" role="img" aria-label="实验数据图表" style="display:none"></svg>
+            </div>
+            <div class="chart-summary" id="chartSummary">
+              <div class="insight-row">
+                <strong>数据状态</strong>
+                <span>尚未导入训练数据。</span>
+              </div>
+              <div class="insight-row">
+                <strong>推荐用法</strong>
+                <span>先导入示例 CSV 查看图形，再替换为你的真实实验数据。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div>
             <h2>推荐下一批实验</h2>
             <p class="section-copy">从 pH、投加量和时间范围内扫描高潜力组合。</p>
           </div>
@@ -662,6 +1059,25 @@
     ];
 
     let trained = null;
+    let chartRows = [];
+
+    const chartLabels = {
+      alginate_pct: "海藻酸钠 / %",
+      chitosan_pct: "壳聚糖 / %",
+      acid_time_h: "冰乙酸时间 / h",
+      modifier_level: "改性强度",
+      freeze_dry_h: "冻干时间 / h",
+      initial_ph: "初始 pH",
+      initial_od: "初始 OD",
+      dose_g_l: "投加量 / g L-1",
+      rpm: "转速 / rpm",
+      time_h: "培养时间 / h",
+      temperature_c: "温度 / degC",
+      target_od: "终点 OD",
+      removal_pct: "去除率 / %"
+    };
+
+    const chartFields = [...featureNames, "target_od", "removal_pct"];
 
     function num(id) {
       const value = Number(document.getElementById(id).value);
@@ -676,6 +1092,108 @@
 
     function clamp(x, lo, hi) {
       return Math.max(lo, Math.min(hi, x));
+    }
+
+    function initAmbient() {
+      const canvas = document.getElementById("ambientCanvas");
+      const ctx = canvas.getContext("2d");
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let width = 0;
+      let height = 0;
+      let t = 0;
+      const points = Array.from({ length: 34 }, (_, i) => ({
+        seed: i * 0.73 + 1,
+        r: 1.2 + (i % 5) * 0.32,
+        alpha: 0.10 + (i % 4) * 0.025
+      }));
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function draw() {
+        t += reduceMotion ? 0 : 0.006;
+        ctx.clearRect(0, 0, width, height);
+
+        const mesh = ctx.createLinearGradient(0, 0, width, height);
+        mesh.addColorStop(0, "rgba(243, 166, 75, 0.09)");
+        mesh.addColorStop(0.46, "rgba(120, 92, 255, 0.055)");
+        mesh.addColorStop(1, "rgba(18, 210, 190, 0.07)");
+        ctx.fillStyle = mesh;
+        ctx.fillRect(0, 0, width, height);
+
+        points.forEach((p, i) => {
+          const x = width * (0.08 + ((Math.sin(t * (0.7 + i * 0.012) + p.seed) + 1) / 2) * 0.84);
+          const y = height * (0.10 + ((Math.cos(t * (0.62 + i * 0.009) + p.seed * 1.8) + 1) / 2) * 0.78);
+          ctx.beginPath();
+          ctx.arc(x, y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = i % 3 === 0 ? `rgba(243, 166, 75, ${p.alpha})` : `rgba(18, 210, 190, ${p.alpha})`;
+          ctx.fill();
+        });
+
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.045)";
+        ctx.lineWidth = 1;
+        for (let i = 0; i < points.length - 1; i += 2) {
+          const a = points[i];
+          const b = points[i + 1];
+          const ax = width * (0.08 + ((Math.sin(t * 0.7 + a.seed) + 1) / 2) * 0.84);
+          const ay = height * (0.10 + ((Math.cos(t * 0.62 + a.seed * 1.8) + 1) / 2) * 0.78);
+          const bx = width * (0.08 + ((Math.sin(t * 0.7 + b.seed) + 1) / 2) * 0.84);
+          const by = height * (0.10 + ((Math.cos(t * 0.62 + b.seed * 1.8) + 1) / 2) * 0.78);
+          ctx.beginPath();
+          ctx.moveTo(ax, ay);
+          ctx.lineTo(bx, by);
+          ctx.stroke();
+        }
+
+        if (!reduceMotion) requestAnimationFrame(draw);
+      }
+
+      resize();
+      draw();
+      window.addEventListener("resize", () => {
+        resize();
+        if (reduceMotion) draw();
+      });
+    }
+
+    function initParallax() {
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduceMotion) return;
+
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+
+      window.addEventListener("pointermove", event => {
+        const x = (event.clientX / window.innerWidth - 0.5) * 26;
+        const y = (event.clientY / window.innerHeight - 0.5) * 18;
+        targetX = x;
+        targetY = y;
+      });
+
+      window.addEventListener("scroll", () => {
+        targetY += Math.min(window.scrollY * 0.012, 18);
+      }, { passive: true });
+
+      function tick() {
+        currentX += (targetX - currentX) * 0.045;
+        currentY += (targetY - currentY) * 0.045;
+        document.body.style.setProperty("--parallax-x", `${currentX.toFixed(2)}px`);
+        document.body.style.setProperty("--parallax-y", `${currentY.toFixed(2)}px`);
+        targetY *= 0.985;
+        requestAnimationFrame(tick);
+      }
+
+      tick();
     }
 
     function heuristic(row, target) {
@@ -874,6 +1392,232 @@
       `).join("");
     }
 
+    function initChartControls() {
+      const x = document.getElementById("chartX");
+      const y = document.getElementById("chartY");
+      const options = chartFields.map(name => `<option value="${name}">${chartLabels[name] || name}</option>`).join("");
+      x.innerHTML = options;
+      y.innerHTML = options;
+      x.value = "initial_ph";
+      y.value = "target_od";
+    }
+
+    function initCustomSelects() {
+      document.querySelectorAll("select").forEach(select => {
+        if (select.dataset.enhanced === "true") return;
+        select.dataset.enhanced = "true";
+        select.classList.add("native-select");
+
+        const wrap = document.createElement("div");
+        wrap.className = "custom-select";
+
+        const trigger = document.createElement("button");
+        trigger.type = "button";
+        trigger.className = "select-trigger";
+        trigger.setAttribute("aria-haspopup", "listbox");
+        trigger.setAttribute("aria-expanded", "false");
+
+        const menu = document.createElement("div");
+        menu.className = "select-menu";
+        menu.setAttribute("role", "listbox");
+
+        select.parentNode.insertBefore(wrap, select.nextSibling);
+        wrap.appendChild(select);
+        wrap.appendChild(trigger);
+        wrap.appendChild(menu);
+
+        trigger.addEventListener("click", event => {
+          event.stopPropagation();
+          closeCustomSelects(wrap);
+          const open = wrap.classList.toggle("open");
+          trigger.setAttribute("aria-expanded", String(open));
+        });
+
+        select.addEventListener("change", () => updateCustomSelect(select));
+        updateCustomSelect(select);
+      });
+
+      document.addEventListener("click", () => closeCustomSelects());
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeCustomSelects();
+      });
+    }
+
+    function closeCustomSelects(except = null) {
+      document.querySelectorAll(".custom-select.open").forEach(wrap => {
+        if (wrap === except) return;
+        wrap.classList.remove("open");
+        wrap.querySelector(".select-trigger")?.setAttribute("aria-expanded", "false");
+      });
+    }
+
+    function updateCustomSelect(select) {
+      const wrap = select.closest(".custom-select");
+      if (!wrap) return;
+      const trigger = wrap.querySelector(".select-trigger");
+      const menu = wrap.querySelector(".select-menu");
+      const selected = select.options[select.selectedIndex];
+      trigger.textContent = selected ? selected.textContent : "请选择";
+      menu.innerHTML = "";
+
+      Array.from(select.options).forEach(option => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = `select-option${option.value === select.value ? " active" : ""}`;
+        item.textContent = option.textContent;
+        item.setAttribute("role", "option");
+        item.setAttribute("aria-selected", String(option.value === select.value));
+        item.addEventListener("click", event => {
+          event.stopPropagation();
+          select.value = option.value;
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+          closeCustomSelects();
+        });
+        menu.appendChild(item);
+      });
+    }
+
+    function validChartRows(rows, xKey, yKey) {
+      return rows
+        .map(row => ({ x: Number(row[xKey]), y: Number(row[yKey]), row }))
+        .filter(point => Number.isFinite(point.x) && Number.isFinite(point.y));
+    }
+
+    function scale(value, min, max, start, end) {
+      if (max === min) return (start + end) / 2;
+      return start + ((value - min) / (max - min)) * (end - start);
+    }
+
+    function niceRange(values) {
+      let min = Math.min(...values);
+      let max = Math.max(...values);
+      if (min === max) {
+        min -= 1;
+        max += 1;
+      }
+      const pad = (max - min) * 0.08;
+      return [min - pad, max + pad];
+    }
+
+    function renderChart() {
+      const svg = document.getElementById("dataChart");
+      const empty = document.getElementById("chartEmpty");
+      const status = document.getElementById("chartStatus");
+      const xKey = document.getElementById("chartX").value;
+      const yKey = document.getElementById("chartY").value;
+      const mode = document.getElementById("chartMode").value;
+      const points = validChartRows(chartRows, xKey, yKey).sort((a, b) => a.x - b.x);
+
+      if (!points.length) {
+        svg.style.display = "none";
+        empty.style.display = "grid";
+        status.textContent = "等待数据";
+        updateChartSummary([]);
+        return;
+      }
+
+      const width = 760;
+      const height = 320;
+      const pad = { left: 62, right: 24, top: 26, bottom: 52 };
+      const [xMin, xMax] = niceRange(points.map(p => p.x));
+      const [yMin, yMax] = niceRange(points.map(p => p.y));
+      const xTicks = Array.from({ length: 5 }, (_, i) => xMin + (i * (xMax - xMin)) / 4);
+      const yTicks = Array.from({ length: 5 }, (_, i) => yMin + (i * (yMax - yMin)) / 4);
+      const coords = points.map(point => ({
+        ...point,
+        cx: scale(point.x, xMin, xMax, pad.left, width - pad.right),
+        cy: scale(point.y, yMin, yMax, height - pad.bottom, pad.top)
+      }));
+
+      const linePath = coords.map((p, i) => `${i === 0 ? "M" : "L"}${p.cx.toFixed(1)},${p.cy.toFixed(1)}`).join(" ");
+      const gridY = yTicks.map(tick => {
+        const y = scale(tick, yMin, yMax, height - pad.bottom, pad.top);
+        return `<line x1="${pad.left}" y1="${y}" x2="${width - pad.right}" y2="${y}" stroke="rgba(255,255,255,0.08)" />
+          <text x="${pad.left - 12}" y="${y + 4}" text-anchor="end" fill="rgba(255,255,255,0.58)" font-size="11">${formatTick(tick)}</text>`;
+      }).join("");
+      const gridX = xTicks.map(tick => {
+        const x = scale(tick, xMin, xMax, pad.left, width - pad.right);
+        return `<line x1="${x}" y1="${pad.top}" x2="${x}" y2="${height - pad.bottom}" stroke="rgba(255,255,255,0.045)" />
+          <text x="${x}" y="${height - 22}" text-anchor="middle" fill="rgba(255,255,255,0.58)" font-size="11">${formatTick(tick)}</text>`;
+      }).join("");
+      const dots = coords.map((p, i) => {
+        const tone = scale(p.y, yMin, yMax, 0.35, 1);
+        return `<circle cx="${p.cx.toFixed(1)}" cy="${p.cy.toFixed(1)}" r="${mode === "line" ? 4.5 : 5.6}" fill="rgba(0,113,227,${tone.toFixed(2)})">
+          <title>${chartLabels[xKey]}: ${formatTick(p.x)}; ${chartLabels[yKey]}: ${formatTick(p.y)}</title>
+        </circle>`;
+      }).join("");
+
+      svg.innerHTML = `
+        <rect x="0" y="0" width="${width}" height="${height}" fill="transparent" />
+        ${gridY}
+        ${gridX}
+        <line x1="${pad.left}" y1="${height - pad.bottom}" x2="${width - pad.right}" y2="${height - pad.bottom}" stroke="rgba(255,255,255,0.25)" />
+        <line x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${height - pad.bottom}" stroke="rgba(255,255,255,0.25)" />
+        ${mode === "line" ? `<path d="${linePath}" fill="none" stroke="rgba(0,113,227,0.56)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />` : ""}
+        ${dots}
+        <text x="${width / 2}" y="${height - 4}" text-anchor="middle" fill="rgba(255,255,255,0.76)" font-size="12" font-weight="650">${chartLabels[xKey]}</text>
+        <text x="18" y="${height / 2}" text-anchor="middle" fill="rgba(255,255,255,0.76)" font-size="12" font-weight="650" transform="rotate(-90 18 ${height / 2})">${chartLabels[yKey]}</text>
+      `;
+      svg.style.display = "block";
+      empty.style.display = "none";
+      status.textContent = `${points.length} 个点`;
+      updateChartSummary(points, xKey, yKey);
+    }
+
+    function formatTick(value) {
+      if (Math.abs(value) >= 100) return value.toFixed(0);
+      if (Math.abs(value) >= 10) return value.toFixed(1).replace(/\.0$/, "");
+      return value.toFixed(2).replace(/\.?0+$/, "");
+    }
+
+    function updateChartSummary(points, xKey, yKey) {
+      const summary = document.getElementById("chartSummary");
+      if (!points.length) {
+        summary.innerHTML = `
+          <div class="insight-row"><strong>数据状态</strong><span>尚未导入训练数据。</span></div>
+          <div class="insight-row"><strong>推荐用法</strong><span>先导入示例 CSV 查看图形，再替换为你的真实实验数据。</span></div>
+        `;
+        return;
+      }
+
+      const best = points.reduce((a, b) => b.y > a.y ? b : a, points[0]);
+      const corr = pearson(points.map(p => p.x), points.map(p => p.y));
+      const yValues = points.map(p => p.y);
+      const yMean = yValues.reduce((s, v) => s + v, 0) / yValues.length;
+      summary.innerHTML = `
+        <div class="insight-row">
+          <strong>最高响应</strong>
+          <span>${chartLabels[yKey]} = ${formatTick(best.y)}，对应 ${chartLabels[xKey]} = ${formatTick(best.x)}。</span>
+        </div>
+        <div class="insight-row">
+          <strong>平均水平</strong>
+          <span>${chartLabels[yKey]} 平均值为 ${formatTick(yMean)}，可作为后续优化的基线。</span>
+        </div>
+        <div class="insight-row">
+          <strong>相关趋势</strong>
+          <span>${chartLabels[xKey]} 与 ${chartLabels[yKey]} 的 Pearson r = ${corr.toFixed(2)}。</span>
+        </div>
+      `;
+    }
+
+    function pearson(xs, ys) {
+      const n = xs.length;
+      if (n < 2) return 0;
+      const mx = xs.reduce((s, v) => s + v, 0) / n;
+      const my = ys.reduce((s, v) => s + v, 0) / n;
+      let num = 0;
+      let dx = 0;
+      let dy = 0;
+      for (let i = 0; i < n; i++) {
+        const a = xs[i] - mx;
+        const b = ys[i] - my;
+        num += a * b;
+        dx += a * a;
+        dy += b * b;
+      }
+      return dx && dy ? num / Math.sqrt(dx * dy) : 0;
+    }
+
     document.getElementById("predictBtn").addEventListener("click", showPrediction);
     document.getElementById("recommendBtn").addEventListener("click", () => { showPrediction(); recommend(); });
     document.getElementById("resetBtn").addEventListener("click", () => {
@@ -891,10 +1635,14 @@
         const target = document.getElementById("target").value;
         const rows = parseCsv(await file.text());
         trained = trainRidge(rows, target);
+        chartRows = rows;
         document.getElementById("modelMode").textContent = `当前：CSV 岭回归模型，目标 ${target}`;
         document.getElementById("sampleInfo").textContent = `训练样本：${trained.n} 行`;
         document.getElementById("fitInfo").textContent = `R2：${trained.r2.toFixed(3)}，RMSE：${trained.rmse.toFixed(3)}`;
         previewRows(trained.rows);
+        document.getElementById("chartY").value = target;
+        updateCustomSelect(document.getElementById("chartY"));
+        renderChart();
         showPrediction();
       } catch (err) {
         alert(err.message || "CSV 训练失败，请检查表头和数值。");
@@ -905,9 +1653,22 @@
       if (trained && trained.target !== document.getElementById("target").value) {
         document.getElementById("sampleInfo").textContent = "目标已切换，请重新导入 CSV 训练";
       }
+      if (chartRows.length) {
+        document.getElementById("chartY").value = document.getElementById("target").value;
+        updateCustomSelect(document.getElementById("chartY"));
+        renderChart();
+      }
       showPrediction();
     });
 
+    ["chartX", "chartY", "chartMode"].forEach(id => {
+      document.getElementById(id).addEventListener("change", renderChart);
+    });
+
+    initAmbient();
+    initParallax();
+    initChartControls();
+    initCustomSelects();
     showPrediction();
   </script>
 </body>
